@@ -1,2 +1,1 @@
-global.rootPath = process.cwd();
-module.exports = require('./build/index.js');
+module.exports = require('./build')

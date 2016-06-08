@@ -1,36 +1,49 @@
-import BabelRootImportHelper from './helper';
+import pathUtils from 'path'
+import unixSlash from 'slash'
+
+
+const babelRoot = process.cwd()
+
 
 export default function() {
-  class BabelRootImport {
-    constructor() {
-      return {
-        'visitor': {
-          ImportDeclaration(path, state) {
-            const defaultPath = path.node.source.value;
+  const defaultOptions = {
+    root  : '',
+    prefix: '~',
+  }
 
-            let rootPathSuffix = '';
-            let rootPathPrefix = '';
+  const visitor = {
+    ImportDeclaration(path, state = {}) {
+      const originalPath = path.node.source.value;
+      const options = Object.assign({}, defaultOptions, state.opts)
 
-            if (state && state.opts) {
-              if (state.opts.rootPathSuffix && typeof state.opts.rootPathSuffix === 'string') {
-                rootPathSuffix = `/${state.opts.rootPathSuffix.replace(/^(\/)|(\/)$/g, '')}`;
-              }
+      validateOptions(options)
 
-              if (state.opts.rootPathPrefix && typeof state.opts.rootPathPrefix === 'string') {
-                rootPathPrefix = state.opts.rootPathPrefix;
-              } else {
-                rootPathPrefix = '~';
-              }
-            }
-
-            if (BabelRootImportHelper().hasRootPathPrefixInString(defaultPath, rootPathPrefix)) {
-              path.node.source.value = BabelRootImportHelper().transformRelativeToRootPath(defaultPath, rootPathSuffix, rootPathPrefix);
-            }
-          }
-        }
-      };
+      if (hasPrefix(originalPath, options.prefix)) {
+        path.node.source.value = pathUtils.join(
+          babelRoot,
+          options.root,
+          originalPath.slice(options.prefix.length)
+        )
+      }
     }
   }
 
-  return new BabelRootImport();
+  return { visitor }
+}
+
+
+function validateOptions(options) {
+  ensureString(options, 'root')
+  ensureString(options, 'prefix')
+}
+
+
+function ensureString(object, key) {
+  if (typeof object[key] !== 'string')
+    throw new Error(`Expected ${key} to be a String, found ${object[key]}`)
+}
+
+
+function hasPrefix(path, prefix) {
+  return unixSlash(path).startsWith(prefix + '/')
 }

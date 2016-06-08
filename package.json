@@ -1,15 +1,14 @@
 {
-  "name": "babel-root-import",
-  "version": "3.2.2",
-  "description": "Babel Plugin to enable relative root-import",
-  "author": "Michael J. Zoidl <github@michaelzoidl.com>",
+  "name": "babel-import-prefix",
+  "version": "1.0.0",
+  "description": "Babel Plugin to enable custom import prefixes",
   "license": "MIT",
   "main": "index.js",
   "files": [
     "index.js",
     "build"
   ],
-  "repository": "michaelzoidl/babel-root-import",
+  "repository": "slezica/babel-import-prefix",
   "scripts": {
     "test": "mocha test/*.spec.js --require config/mocha.js --compilers js:babel-core/register",
     "test-watch": "mocha test/*.spec.js --require config/mocha.js --compilers js:babel-core/register --watch",
